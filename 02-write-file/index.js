@@ -1,32 +1,12 @@
-// const fs = require('fs');
-// const path = require('path');
-// let data = '';
-// function fileHandler(){
-//   fs.open(path.join(__dirname, 'text.txt'), 'w', (err) => {
-//       if(err) throw err;
-//   });
-// }
-// fileHandler()
-// // fileHandlerAPP()
-// console.log('Enter your text...')
-// const readline = require('readline').createInterface({
-//   input: process.stdin,
-//   output: process.stdout
-// })
-
-// readline.question(``, name => {
-//   if(name.includes('Exit')){
-//     name = name.slice(0, name.indexOf('Exit'))
-//     console.log('Your text: ', name) 
-//     readline.close()
-    
-//   }
-  
-// })
-
-
-
-
-
-
-
+const fs = require('fs');
+const path = require("path");
+const txtFile = path.join(__dirname, 'text.txt');
+const stream = fs.createWriteStream(txtFile);
+process.stdout.write('\nPlease enter your text...\nTo exit please enter (ctrl + c) or (exit).\n\n');
+process.openStdin().on('data', data => {
+  if(data.toString('UTF8').trim() === 'exit') {
+    process.exit(0);
+  } else {stream.write(data)};
+});
+process.on('exit', () => process.stdout.write('\nGood luck in your studies)\n\n'));
+process.on('SIGINT', () => process.exit(0));
