@@ -73,9 +73,11 @@ function next(){
         template = template.replaceAll(`{{${cl.slice(0, cl.indexOf('.'))}}}`, data)
         dats.push(template);
       }
-      
-    if(counter == positionEl.length ){
-      streamCreatedIndex.write(template);      
+      if(counter === 1){
+      fs.truncate(path.join(__dirname, 'project-dist/index.html'), err => {
+        if(err) console.log(err);
+        streamCreatedIndex.write(template)
+      });
     }
     } else if(type == 'template'){
       template = data;
