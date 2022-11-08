@@ -25,7 +25,6 @@ function next(){
     let x = '';
     let ret = 0;
     let arr = [];
-    let txt = a
     while(x !== 'not'){
         if(a.includes('{{') && a.includes('}}')){
           arr.push(a.slice(a.indexOf('{'), a.indexOf('}')+2))
@@ -36,7 +35,7 @@ function next(){
     arr.push(ret);
     return arr;
   };
-  read = (x, type) => {
+  read = (x, type, cl) => {
     let data = '';
     if(type == 'css'){
       const streamReadStyle = new fs.ReadStream(path.join(__dirname, `styles/${x}`), 'UTF8');
@@ -46,7 +45,7 @@ function next(){
     } else if(type == 'html'){
       const streamReadHtml = new fs.ReadStream(path.join(__dirname, `components/${x}`), 'UTF8');
       streamReadHtml.on('data', chunk => {data += chunk});
-      streamReadHtml.on('end', function(){writeData(`${data}`, 'html')});
+      streamReadHtml.on('end', function(){writeData(`${data}`, 'html', cl)});
       streamReadHtml.on("error", err => {console.log('ERROR', err.message)});
     } else if(type == 'template'){
       const streamTemplate = new fs.ReadStream(path.join(__dirname, `template.html`), 'UTF8');
@@ -58,28 +57,35 @@ function next(){
   let x = 0;
   let template = '';
   let positionEl = [];
+  let indEl = [];
   let counter = 0;
   let dataOfEl = [];
-  writeData = (data, type) => {
+  let dats = []
+  writeData = (data, type, cl) => {
     if(type == 'css'){
       streamCreatedStyle.write(data);
     } else if(type == 'html'){
-      fs.truncate('06-build-page/project-dist/index-html', err => {})  
       counter += 1;
       dataOfEl.push(data)
-      if(counter === x){
-        for(let i = 0; i < positionEl.length; i++){
-          template = template.replaceAll(positionEl[i], dataOfEl[i]);
-        };
-        streamCreatedIndex.write(template);
-      };
+      indEl.push(cl.slice(0, cl.indexOf('.')));
+      
+      if(positionEl.join().includes(`{{${cl.slice(0, cl.indexOf('.'))}}}`)){
+        template = template.replaceAll(`{{${cl.slice(0, cl.indexOf('.'))}}}`, data)
+        dats.push(template);
+      }
+      
+    if(counter == positionEl.length ){
+      streamCreatedIndex.write(template);      
+    }
     } else if(type == 'template'){
       template = data;
       let a = '';
       a = template;  
       x = countt(a)
       positionEl = x.slice(0, x.length-1);
-      x = x[x.length-1];
+      
+      x = x.length;      
+     
     };
   };
   read(0, 'template');
